@@ -19,18 +19,18 @@ import { patch } from './patch'
 import platformDirectives from './directives/index'
 import platformComponents from './components/index'
 
-// install platform specific utils
-Vue.config.mustUseProp = mustUseProp
-Vue.config.isReservedTag = isReservedTag
-Vue.config.isReservedAttr = isReservedAttr
-Vue.config.getTagNamespace = getTagNamespace
-Vue.config.isUnknownElement = isUnknownElement
+// install platform specific utils 安装特定平台工具
+Vue.config.mustUseProp = mustUseProp // 必须使用prop的配置, return  Boolean
+Vue.config.isReservedTag = isReservedTag // 预留标签
+Vue.config.isReservedAttr = isReservedAttr // 预留属性 style,class
+Vue.config.getTagNamespace = getTagNamespace // 'svg' 'math'
+Vue.config.isUnknownElement = isUnknownElement //  Unknown Element?
 
-// install platform runtime directives & components
-extend(Vue.options.directives, platformDirectives)
-extend(Vue.options.components, platformComponents)
+// install platform runtime directives & components  安装平台运行时指令和组件
+extend(Vue.options.directives, platformDirectives) // v-show  v-model
+extend(Vue.options.components, platformComponents) // <transition> <transition-group> 动画的全局组件
 
-// install platform patch function
+// install platform patch function  此处  挂载私有的patch方法
 Vue.prototype.__patch__ = inBrowser ? patch : noop
 
 // public mount method
@@ -39,6 +39,7 @@ Vue.prototype.$mount = function (
   hydrating?: boolean
 ): Component {
   el = el && inBrowser ? query(el) : undefined
+  // 挂载之前, 先执行钩子 beforeCreated created beforeMounted
   return mountComponent(this, el, hydrating)
 }
 

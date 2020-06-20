@@ -19,9 +19,9 @@ import type { SimpleSet } from '../util/index'
 let uid = 0
 
 /**
- * A watcher parses an expression, collects dependencies,
+ * A watcher parses解析 an expression表达式, collects dependencies,
  * and fires callback when the expression value changes.
- * This is used for both the $watch() api and directives.
+ * This is used for(用于) both the $watch() api and directives.
  */
 export default class Watcher {
   vm: Component;
@@ -59,7 +59,7 @@ export default class Watcher {
       this.deep = !!options.deep
       this.user = !!options.user
       this.lazy = !!options.lazy
-      this.sync = !!options.sync
+      this.sync = !!options.sync // 没配置的话 默认 false
       this.before = options.before
     } else {
       this.deep = this.user = this.lazy = this.sync = false
@@ -77,7 +77,7 @@ export default class Watcher {
       : ''
     // parse expression for getter
     if (typeof expOrFn === 'function') {
-      this.getter = expOrFn
+      this.getter = expOrFn // 把new Watch()的第二个参数, 变成getter
     } else {
       this.getter = parsePath(expOrFn)
       if (!this.getter) {
@@ -96,14 +96,14 @@ export default class Watcher {
   }
 
   /**
-   * Evaluate the getter, and re-collect dependencies.
+   * Evaluate评估 the getter, and re-collect dependencies.
    */
   get () {
     pushTarget(this)
     let value
     const vm = this.vm
     try {
-      value = this.getter.call(vm, vm)
+      value = this.getter.call(vm, vm) // mounted 执行  vm._update(vm._render(), hydrating)
     } catch (e) {
       if (this.user) {
         handleError(e, vm, `getter for watcher "${this.expression}"`)
@@ -158,24 +158,26 @@ export default class Watcher {
   }
 
   /**
-   * Subscriber interface.
-   * Will be called when a dependency changes.
+   * Subscriber interface.  订户界面。
+   * Will be called when a dependency changes.  依赖项更改时将被调用。
    */
   update () {
     /* istanbul ignore else */
     if (this.lazy) {
       this.dirty = true
     } else if (this.sync) {
-      this.run()
+      this.run() // 执行监听对象 的 value(绑定的函数)  比如 watch:{ .. }
     } else {
+      // 控制执行顺序, 并执行data对应的func
       queueWatcher(this)
     }
   }
 
   /**
-   * Scheduler job interface.
-   * Will be called by the scheduler.
+   * Scheduler job interface.   计划程序作业界面。
+   * Will be called by the scheduler.   将由调度程序调用
    */
+  // 执行监听对象 的 value(绑定的函数)  比如 watch:{ .. }
   run () {
     if (this.active) {
       const value = this.get()

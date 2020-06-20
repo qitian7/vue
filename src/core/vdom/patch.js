@@ -140,7 +140,7 @@ export function createPatchFunction (backend) {
       vnode = ownerArray[index] = cloneVNode(vnode)
     }
 
-    vnode.isRootInsert = !nested // for transition enter check
+    vnode.isRootInsert = !nested // for transition enter check 过渡一下平滑 输入检查
     if (createComponent(vnode, insertedVnodeQueue, parentElm, refElm)) {
       return
     }
@@ -180,14 +180,25 @@ export function createPatchFunction (backend) {
           }
           insert(parentElm, vnode.elm, refElm)
         }
-        createChildren(vnode, children, insertedVnodeQueue)
+        createChildren(vnode, children, insertedVnodeQueue) // 递归
         if (appendAsTree) {
           if (isDef(data)) {
+            /** 把vnode 编译成 真正的dom
+               0: ƒ updateAttrs(oldVnode, vnode)
+               1: ƒ updateClass(oldVnode, vnode)
+               2: ƒ updateDOMListeners(oldVnode, vnode)
+               3: ƒ updateDOMProps(oldVnode, vnode)
+               4: ƒ updateStyle(oldVnode, vnode)
+               5: ƒ _enter(_, vnode)
+               6: ƒ create(_, vnode)
+               7: ƒ updateDirectives(oldVnode, vnode)
+             */
             invokeCreateHooks(vnode, insertedVnodeQueue)
           }
           insert(parentElm, vnode.elm, refElm)
         }
       } else {
+        // 递归
         createChildren(vnode, children, insertedVnodeQueue)
         if (isDef(data)) {
           invokeCreateHooks(vnode, insertedVnodeQueue)
@@ -198,10 +209,10 @@ export function createPatchFunction (backend) {
       if (process.env.NODE_ENV !== 'production' && data && data.pre) {
         creatingElmInVPre--
       }
-    } else if (isTrue(vnode.isComment)) {
+    } else if (isTrue(vnode.isComment)) { // 如果是 注释 走这里
       vnode.elm = nodeOps.createComment(vnode.text)
       insert(parentElm, vnode.elm, refElm)
-    } else {
+    } else { // 如果是 文本 text 走这里
       vnode.elm = nodeOps.createTextNode(vnode.text)
       insert(parentElm, vnode.elm, refElm)
     }
@@ -312,9 +323,9 @@ export function createPatchFunction (backend) {
     }
   }
 
-  // set scope id attribute for scoped CSS.
-  // this is implemented as a special case to avoid the overhead
-  // of going through the normal attribute patching process.
+  // 设置作用域id属性, 为了实现css作用域
+  // set scope(作用域) id attribute for scoped CSS.
+  // this is implemented(实现) as a special case(方法) to avoid(避免) the overhead of(昂贵的代价) going through the normal attribute patching process.
   function setScope (vnode) {
     let i
     if (isDef(i = vnode.fnScopeId)) {
@@ -473,6 +484,7 @@ export function createPatchFunction (backend) {
     }
   }
 
+  // Duplicate 重复
   function checkDuplicateKeys (children) {
     const seenKeys = {}
     for (let i = 0; i < children.length; i++) {
@@ -712,14 +724,15 @@ export function createPatchFunction (backend) {
       createElm(vnode, insertedVnodeQueue)
     } else {
       const isRealElement = isDef(oldVnode.nodeType)
-      if (!isRealElement && sameVnode(oldVnode, vnode)) {
+      if (!isRealElement && sameVnode(oldVnode, vnode)) { // 相同的vnode
         // patch existing root node
         patchVnode(oldVnode, vnode, insertedVnodeQueue, null, null, removeOnly)
-      } else {
+      } else { // 不同的vnode
         if (isRealElement) {
-          // mounting to a real element
-          // check if this is server-rendered content and if we can perform
-          // a successful hydration.
+          //  server-rendered 服务端渲染 !!!
+          // mounting(安装) to a real element
+          // check if this is server-rendered content(服务渲染内容) and if we can perform
+          // a successful hydration(注水, 类似: 把html代码的字符串, JSON.parse, 整成能用的, 背景: ssr时服务器输出的是字符串, 浏览器的框架 需要 hydration it).
           if (oldVnode.nodeType === 1 && oldVnode.hasAttribute(SSR_ATTR)) {
             oldVnode.removeAttribute(SSR_ATTR)
             hydrating = true
@@ -738,8 +751,9 @@ export function createPatchFunction (backend) {
               )
             }
           }
+          //  server-rendered 服务端渲染
           // either not server-rendered, or hydration failed.
-          // create an empty node and replace it
+          // create an empty node and replace it (创建一个空的vnode)
           oldVnode = emptyNodeAt(oldVnode)
         }
 

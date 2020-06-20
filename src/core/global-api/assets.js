@@ -2,6 +2,13 @@
 
 import { ASSET_TYPES } from 'shared/constants'
 import { isPlainObject, validateComponentName } from '../util/index'
+/**
+ export const ASSET_TYPES = [
+   'component',
+   'directive',
+   'filter'
+ ]
+ */
 
 export function initAssetRegisters (Vue: GlobalAPI) {
   /**

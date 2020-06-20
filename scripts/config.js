@@ -218,6 +218,7 @@ function genConfig (name) {
   const config = {
     input: opts.entry,
     external: opts.external,
+    // sourceMap: true, // 加上这个, 可以定位调试
     plugins: [
       flow(),
       alias(Object.assign({}, aliases, opts.alias))
@@ -262,6 +263,11 @@ function genConfig (name) {
 
   return config
 }
+
+/** npm run xxx 要想跑起来
+ *  1.中文目录(路径内一定不能出现中文)
+ *  2. npm install rollup-plugin-alias@1.4.0 --save-dev   升级支持 Windows 目录
+ */
 
 if (process.env.TARGET) {
   module.exports = genConfig(process.env.TARGET)

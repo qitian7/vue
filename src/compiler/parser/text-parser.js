@@ -21,8 +21,9 @@ export function parseText (
   text: string,
   delimiters?: [string, string]
 ): TextParseResult | void {
+  // 是否有 {{ .. }} 胡子语法
   const tagRE = delimiters ? buildRegex(delimiters) : defaultTagRE
-  if (!tagRE.test(text)) {
+  if (!tagRE.test(text)) { // 如果没有 胡子语法 则return
     return
   }
   const tokens = []
@@ -36,7 +37,15 @@ export function parseText (
       rawTokens.push(tokenValue = text.slice(lastIndex, index))
       tokens.push(JSON.stringify(tokenValue))
     }
-    // tag token
+
+    // tag token   校验表达式, 比如{{msg.toString()}}
+    /* exp: Object
+     *   expression: ""\n    "+_s(message)+"\n    ""
+         tokens: Array(3)
+            0: "↵    "
+            1: {@binding: "message"}
+            2: "↵    "
+     * */
     const exp = parseFilters(match[1].trim())
     tokens.push(`_s(${exp})`)
     rawTokens.push({ '@binding': exp })

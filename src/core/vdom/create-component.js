@@ -146,11 +146,12 @@ export function createComponent (
 
   data = data || {}
 
-  // resolve constructor options in case global mixins are applied after
+  // resolve constructor options in case(万一) global mixins are applied after
   // component constructor creation
   resolveConstructorOptions(Ctor)
 
   // transform component v-model data into props & events
+  // 把v-mode的值, 转成props里的data
   if (isDef(data.model)) {
     transformModel(Ctor.options, data)
   }
@@ -163,17 +164,15 @@ export function createComponent (
     return createFunctionalComponent(Ctor, propsData, data, context, children)
   }
 
-  // extract listeners, since these needs to be treated as
-  // child component listeners instead of DOM listeners
+  // extract listeners, since these needs to be treated as(被视为)
+  // child component listeners instead of(而不是) DOM listeners
   const listeners = data.on
   // replace with listeners with .native modifier
   // so it gets processed during parent component patch.
   data.on = data.nativeOn
 
   if (isTrue(Ctor.options.abstract)) {
-    // abstract components do not keep anything
-    // other than props & listeners & slot
-
+    // abstract抽象 components do not keep anything other than (不要保留任何东西 除了: ) props & listeners & slot
     // work around flow
     const slot = data.slot
     data = {}

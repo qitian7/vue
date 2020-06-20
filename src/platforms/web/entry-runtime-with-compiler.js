@@ -14,7 +14,12 @@ const idToTemplate = cached(id => {
   return el && el.innerHTML
 })
 
-const mount = Vue.prototype.$mount
+const mount = Vue.prototype.$mount // 此处保存了原来的 $mount, 下面又覆写了一个新的mount
+
+/** 主要是
+ *    1. 把 el 对应的模板转成  _c(..) 的函数
+ *    2. 绑在render上  vm.render = 上面那个函数
+ */
 Vue.prototype.$mount = function (
   el?: string | Element,
   hydrating?: boolean
@@ -54,6 +59,8 @@ Vue.prototype.$mount = function (
         return this
       }
     } else if (el) {
+      //  element.outerHTML 获取描述元素（包括其后代）的序列化HTML片段。也可以给节点替换元素。
+      // 此处是拿到 包括#app 在内的  所有HTML描述片段
       template = getOuterHTML(el)
     }
     if (template) {
@@ -62,6 +69,7 @@ Vue.prototype.$mount = function (
         mark('compile')
       }
 
+      // 把 template 转换成 Function
       const { render, staticRenderFns } = compileToFunctions(template, {
         outputSourceRange: process.env.NODE_ENV !== 'production',
         shouldDecodeNewlines,

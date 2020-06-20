@@ -66,9 +66,9 @@ if (inBrowser && !isIE) {
 }
 
 /**
- * Flush both queues and run the watchers.
+ * Flush刷新 both queues and run the watchers.
  */
-function flushSchedulerQueue () {
+function flushSchedulerQueue () { // 刷新 调度 程序队列
   currentFlushTimestamp = getNow()
   flushing = true
   let watcher, id
@@ -158,23 +158,25 @@ function callActivatedHooks (queue) {
 
 /**
  * Push a watcher into the watcher queue.
- * Jobs with duplicate IDs will be skipped unless it's
- * pushed when the queue is being flushed.
+ * Jobs with duplicate IDs will be skipped unless it's pushed when the queue is being flushed.
+   *将观察者推入观察者队列。
+      除非刷新队列时将其推送，否则具有重复ID的作业将被跳过。
  */
+// 控制执行顺序, 并执行data对应的func
 export function queueWatcher (watcher: Watcher) {
   const id = watcher.id
   if (has[id] == null) {
     has[id] = true
-    if (!flushing) {
+    if (!flushing) { // 冲洗
       queue.push(watcher)
     } else {
-      // if already flushing, splice the watcher based on its id
-      // if already past its id, it will be run next immediately.
+      // if already flushing, splice the watcher based on its id   如果已经冲洗，则根据其ID拼接观察者
+      // if already past its id, it will be run next immediately.  如果已经超过其ID，它将立即立即运行。
       let i = queue.length - 1
       while (i > index && queue[i].id > watcher.id) {
         i--
       }
-      queue.splice(i + 1, 0, watcher)
+      queue.splice(i + 1, 0, watcher) // 排队,排在..后面
     }
     // queue the flush
     if (!waiting) {

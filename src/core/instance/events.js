@@ -13,6 +13,7 @@ export function initEvents (vm: Component) {
   vm._events = Object.create(null)
   vm._hasHookEvent = false
   // init parent attached events
+  // 初始化父附加事件
   const listeners = vm.$options._parentListeners
   if (listeners) {
     updateComponentListeners(vm, listeners)
@@ -115,6 +116,7 @@ export function eventsMixin (Vue: Class<Component>) {
     return vm
   }
 
+  // 执行事件 vm._events 里的
   Vue.prototype.$emit = function (event: string): Component {
     const vm: Component = this
     if (process.env.NODE_ENV !== 'production') {
@@ -135,6 +137,7 @@ export function eventsMixin (Vue: Class<Component>) {
       const args = toArray(arguments, 1)
       const info = `event handler for "${event}"`
       for (let i = 0, l = cbs.length; i < l; i++) {
+        // 调用 emit 传入的事件(with 异常处理)
         invokeWithErrorHandling(cbs[i], vm, args, vm, info)
       }
     }

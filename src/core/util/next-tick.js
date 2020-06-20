@@ -84,6 +84,11 @@ if (typeof Promise !== 'undefined' && isNative(Promise)) {
   }
 }
 
+// ctx的意识是context
+/** nextTick 实现
+ *    1. native用的是setImmediate
+ *    2. 浏览器环境用的是 执行一个 promise
+ */
 export function nextTick (cb?: Function, ctx?: Object) {
   let _resolve
   callbacks.push(() => {
@@ -97,6 +102,12 @@ export function nextTick (cb?: Function, ctx?: Object) {
       _resolve(ctx)
     }
   })
+  /** 作为一个 Promise 使用 (2.1.0 起新增，详见接下来的提示)
+       Vue.nextTick()
+         .then(function () {
+          // DOM 更新了
+        })
+   */
   if (!pending) {
     pending = true
     timerFunc()

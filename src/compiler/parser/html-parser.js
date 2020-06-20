@@ -64,7 +64,7 @@ export function parseHTML (html, options) {
     if (!lastTag || !isPlainTextElement(lastTag)) {
       let textEnd = html.indexOf('<')
       if (textEnd === 0) {
-        // Comment:
+        // Comment:  校验一下 有没有注释
         if (comment.test(html)) {
           const commentEnd = html.indexOf('-->')
 
@@ -78,6 +78,7 @@ export function parseHTML (html, options) {
         }
 
         // http://en.wikipedia.org/wiki/Conditional_comment#Downlevel-revealed_conditional_comment
+        // 兼容条件注释
         if (conditionalComment.test(html)) {
           const conditionalEnd = html.indexOf(']>')
 
@@ -94,7 +95,7 @@ export function parseHTML (html, options) {
           continue
         }
 
-        // End tag:
+        // End tag:   endtag  <child />
         const endTagMatch = html.match(endTag)
         if (endTagMatch) {
           const curIndex = index
@@ -103,7 +104,7 @@ export function parseHTML (html, options) {
           continue
         }
 
-        // Start tag:
+        // Start tag:   // 处理 tag 及里面的内容
         const startTagMatch = parseStartTag()
         if (startTagMatch) {
           handleStartTag(startTagMatch)
@@ -176,7 +177,7 @@ export function parseHTML (html, options) {
     }
   }
 
-  // Clean up any remaining tags
+  // Clean up any remaining tags    清理所有剩余标签
   parseEndTag()
 
   function advance (n) {

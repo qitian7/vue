@@ -66,7 +66,7 @@ export function createASTElement (
     type: 1,
     tag,
     attrsList: attrs,
-    attrsMap: makeAttrsMap(attrs),
+    attrsMap: makeAttrsMap(attrs), // 拿到attrs 的map
     rawAttrsMap: {},
     parent,
     children: []
@@ -221,6 +221,7 @@ export function parse (
         attrs = guardIESVGBug(attrs)
       }
 
+      // createASTElement
       let element: ASTElement = createASTElement(tag, attrs, currentParent)
       if (ns) {
         element.ns = ns
@@ -259,11 +260,12 @@ export function parse (
         )
       }
 
-      // apply pre-transforms
+      // apply pre-transforms    解析input
       for (let i = 0; i < preTransforms.length; i++) {
         element = preTransforms[i](element, options) || element
       }
 
+      // 解析pre
       if (!inVPre) {
         processPre(element)
         if (element.pre) {
@@ -277,14 +279,16 @@ export function parse (
         processRawAttrs(element)
       } else if (!element.processed) {
         // structural directives
-        processFor(element)
-        processIf(element)
-        processOnce(element)
+        processFor(element) // 解析v-for
+        processIf(element) // 解析v-if
+        processOnce(element) // 解析v-once
       }
 
+      // 添加 根root
       if (!root) {
         root = element
         if (process.env.NODE_ENV !== 'production') {
+          // 根root元素 不能用 <slot> <template> 和 v-for
           checkRootConstraints(root)
         }
       }
@@ -353,10 +357,13 @@ export function parse (
       if (text) {
         if (!inPre && whitespaceOption === 'condense') {
           // condense consecutive whitespaces into single space
+          // 将连续的空格压缩为单个空格
           text = text.replace(whitespaceRE, ' ')
         }
         let res
         let child: ?ASTNode
+        // res = parseText(text, delimiters)  解析每个子元素的innerHTML
+        // 比如 text 是 {{message}}
         if (!inVPre && text !== ' ' && (res = parseText(text, delimiters))) {
           child = {
             type: 2,

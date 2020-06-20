@@ -33,6 +33,8 @@ export function handleError (err: Error, vm: any, info: string) {
   }
 }
 
+// invoke 调用
+// 调用 emit 传入的事件(with 异常处理)
 export function invokeWithErrorHandling (
   handler: Function,
   context: any,

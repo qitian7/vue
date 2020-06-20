@@ -48,19 +48,20 @@ export function proxy (target: Object, sourceKey: string, key: string) {
 export function initState (vm: Component) {
   vm._watchers = []
   const opts = vm.$options
-  if (opts.props) initProps(vm, opts.props)
-  if (opts.methods) initMethods(vm, opts.methods)
+  if (opts.props) initProps(vm, opts.props) // 添加代理和响应式
+  if (opts.methods) initMethods(vm, opts.methods) // 把methods里的function挂到 对应作用域实例上
   if (opts.data) {
-    initData(vm)
+    initData(vm) // 初始化data, 排错, 给所有的data 增加 get set的监听
   } else {
     observe(vm._data = {}, true /* asRootData */)
   }
-  if (opts.computed) initComputed(vm, opts.computed)
+  if (opts.computed) initComputed(vm, opts.computed) // 排错 给computed的key添加Watcher, get set
   if (opts.watch && opts.watch !== nativeWatch) {
-    initWatch(vm, opts.watch)
+    initWatch(vm, opts.watch) // 校验完 最终交给 vm.$watch 处理了
   }
 }
 
+// 添加代理和响应式
 function initProps (vm: Component, propsOptions: Object) {
   const propsData = vm.$options.propsData || {}
   const props = vm._props = {}
@@ -109,12 +110,13 @@ function initProps (vm: Component, propsOptions: Object) {
   toggleObserving(true)
 }
 
+// 校验  和  给所有的data 增加 get set的监听
 function initData (vm: Component) {
   let data = vm.$options.data
-  data = vm._data = typeof data === 'function'
+  data = vm._data = typeof data === 'function' // 组件内的data, 是function
     ? getData(data, vm)
     : data || {}
-  if (!isPlainObject(data)) {
+  if (!isPlainObject(data)) { // 校验data是不是对象
     data = {}
     process.env.NODE_ENV !== 'production' && warn(
       'data functions should return an object:\n' +
@@ -127,6 +129,7 @@ function initData (vm: Component) {
   const props = vm.$options.props
   const methods = vm.$options.methods
   let i = keys.length
+  // 校验是否重名  props 和 methods内, 重名则报错
   while (i--) {
     const key = keys[i]
     if (process.env.NODE_ENV !== 'production') {
@@ -144,10 +147,11 @@ function initData (vm: Component) {
         vm
       )
     } else if (!isReserved(key)) {
-      proxy(vm, `_data`, key)
+      proxy(vm, `_data`, key) // 把 _data里的 属性和值, 同步挂到 vm下
     }
   }
   // observe data
+  // 给所有的data 增加 get set的监听
   observe(data, true /* asRootData */)
 }
 
@@ -192,10 +196,10 @@ function initComputed (vm: Component, computed: Object) {
       )
     }
 
-    // component-defined computed properties are already defined on the
-    // component prototype. We only need to define computed properties defined
-    // at instantiation here.
+    // component-defined computed properties are already defined on the component prototype.
+    // We only need to define computed properties defined at instantiation here.
     if (!(key in vm)) {
+      // 添加监听key  get set
       defineComputed(vm, key, userDef)
     } else if (process.env.NODE_ENV !== 'production') {
       if (key in vm.$data) {
@@ -207,6 +211,7 @@ function initComputed (vm: Component, computed: Object) {
   }
 }
 
+// 添加监听key  get set
 export function defineComputed (
   target: any,
   key: string,
@@ -259,6 +264,7 @@ function createGetterInvoker(fn) {
   }
 }
 
+// 把methods的 键值对 加到实例上
 function initMethods (vm: Component, methods: Object) {
   const props = vm.$options.props
   for (const key in methods) {

@@ -18,6 +18,7 @@ import {
   defineReactive
 } from '../util/index'
 
+// Vue.config 是一个对象，包含 Vue 的全局配置  等 全局 API
 export function initGlobalAPI (Vue: GlobalAPI) {
   // config
   const configDef = {}
@@ -62,8 +63,8 @@ export function initGlobalAPI (Vue: GlobalAPI) {
 
   extend(Vue.options.components, builtInComponents)
 
-  initUse(Vue)
-  initMixin(Vue)
-  initExtend(Vue)
-  initAssetRegisters(Vue)
+  initUse(Vue) // Vue.use()
+  initMixin(Vue) // Vue.mixin
+  initExtend(Vue) // Vue.extend
+  initAssetRegisters(Vue) // Vue.component  directive  filter
 }

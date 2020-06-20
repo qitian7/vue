@@ -89,4 +89,6 @@ if (process.env.NODE_ENV !== 'production') {
   }
 }
 
+/** 错误提示 监听
+ */
 export { initProxy }
